@@ -17,14 +17,16 @@ func New[T any](path string) (s *Storage[T]) {
 	}
 }
 
-func (s *Storage[T]) Read(p *T) (err error) {
+func (s *Storage[T]) Read() (p *T, err error) {
 	s.Lock.RLock()
 	defer s.Lock.RUnlock()
 	f, err := os.ReadFile(s.Path)
 	if err != nil {
 		return
 	}
-	return json.Unmarshal(f, p)
+	p = new(T)
+	err = json.Unmarshal(f, p)
+	return p, err
 }
 
 func (s *Storage[T]) Write(p *T) (err error) {
