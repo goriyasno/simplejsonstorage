@@ -6,18 +6,18 @@ import (
 	"sync"
 )
 
-type Storage struct {
+type Storage[T any] struct {
 	Lock sync.RWMutex
 	Path string
 }
 
-func New(path string) (s *Storage) {
-	return &Storage{
+func New[T any](path string) (s *Storage[T]) {
+	return &Storage[T]{
 		Path: path,
 	}
 }
 
-func (s *Storage) Read(p any) (err error) {
+func (s *Storage[T]) Read(p *T) (err error) {
 	s.Lock.RLock()
 	defer s.Lock.RUnlock()
 	f, err := os.ReadFile(s.Path)
@@ -27,7 +27,7 @@ func (s *Storage) Read(p any) (err error) {
 	return json.Unmarshal(f, p)
 }
 
-func (s *Storage) Write(p any) (err error) {
+func (s *Storage[T]) Write(p *T) (err error) {
 	s.Lock.Lock()
 	defer s.Lock.Unlock()
 	data, err := json.Marshal(p)
